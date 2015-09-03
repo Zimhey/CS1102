@@ -1,6 +1,3 @@
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-reader.ss" "lang")((modname HW1) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
 #|
 Authors:
  Corey Dixon
@@ -62,9 +59,6 @@ Description: Homework #1
 
 ;;num-char: number
 
-;********
-;;*******QUESTION******* - Should examples be written here?
-;;*******
 
 ;;Examples of insert
 (define HELLO(make-insert "Hello"))
@@ -77,11 +71,12 @@ Description: Homework #1
 
 ;;Examples of patches
 (make-patch 2 (make-insert "llo"))
-(make-patch 9 (make-delete 7))
+(define DEL-1(make-patch 1 (make-delete 4)))
 (define INS-HELLO(make-patch 0 HELLO))
 (define DEL-2(make-patch 3 DEL2))
 (define INS-DEF(make-patch 3 (make-insert "DEF")))
-(define DEL-0(make-patch 0 (make-delete 2)))
+(define DEL-6(make-patch 6 (make-delete 2)))
+(define INS-XYZ(make-patch 22 (make-insert "XYZ")))
 
 ;;Problem #2
 
@@ -127,7 +122,6 @@ You may assume that the string is long enough for the operation given in the pat
   (apply-op (patch-op a-patch) str (patch-pos a-patch)))
 
 #| Problem 4: 
-
 |#
 
 ;;helper function
@@ -156,26 +150,44 @@ You may assume that the string is long enough for the operation given in the pat
 (define (ins-patch? a-patch)
   (insert? (patch-op a-patch)))
 
-;;overlap? patch patch -> boolean
+;;overlap?: patch patch -> boolean
 ;;consumes two patches
 ;;produces a boolean indidicating whether the two patches cannot be applied to the same string because they conflict
 
 ;;Test Cases
 (check-expect (overlap? INS-HELLO INS-HELLO) true)
 (check-expect (overlap? DEL-2 DEL-2) true)
-(check-expect (overlap? INS-DEF DEL-0) false)
+(check-expect (overlap? DEL-1 INS-DEF) true)
+(check-expect (overlap? INS-DEF DEL-1) true)
+(check-expect (overlap? INS-HELLO INS-XYZ) false)
+(check-expect (overlap? DEL-1 DEL-6) false)
 
 ;;Definition
-
 (define (overlap? patch1 patch2)
- (cond[(and (ins-patch? patch1) (ins-patch? patch2))
+  (cond[(and (ins-patch? patch1) (ins-patch? patch2))      ;;Two insertions start at same location?
        (= (patch-pos patch1) (patch-pos patch2))]
-      [(and (del-patch? patch1) (del-patch? patch2))
-       (or (in-patch-range? patch1 (patch-pos patch2)) (in-patch-range? patch2 (patch-pos patch1)))]
-      [(and (del-patch? patch1) (ins-patch? patch2))
-       (in-patch-range? patch1 (patch-pos patch2))]
-      [(and (del-patch? patch2) (ins-patch? patch1))
+       
+      [(and (del-patch? patch1) (del-patch? patch2))       ;;Two deletions whose ranges overlap?
+       (or (in-patch-range? patch1 (patch-pos patch2))
+           (in-patch-range? patch2 (patch-pos patch1)))]
+      
+      [(and (del-patch? patch1) (ins-patch? patch2))       ;;An insertion that starts inside the range of deletion?
+       (in-patch-range? patch1 (patch-pos patch2))]       
+      [(and (del-patch? patch2) (ins-patch? patch1))       
        (in-patch-range? patch2 (patch-pos patch1))]
       )
   )
+
+;;merge: string -> patch patch
+;;consumes a string
+;;produces a string reflecting both patches or false if the patches do not overlap
+
+;;Test Cases
+
+
+;;Problem 6
+#|
+Returning false in the event of an overlap indicates to the user that
+a merge did not occur.
+|#
 
