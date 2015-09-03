@@ -191,3 +191,80 @@ Returning false in the event of an overlap indicates to the user that
 a merge did not occur.
 |#
 
+
+#|
+case 1 : patches are delete
+	case a patch 1 position is closer to the end
+	case b patch 2 position is closer to the end
+case 2 : only patch 1 is delete
+case 3 : only patch 2 is delete
+case 4 : both must be insert
+	case a patch 1 position is closer to the end
+	case b patch 2 position is closer to the end
+|#
+
+;;Insert patch examples
+(define AB(make-patch 0 (make-insert "AB")))
+(define CD(make-patch 2 (make-insert "CD")))
+(define ERR-0(make-patch 0 (make-insert "Error: Overlap")))
+
+;;Delete patch examples
+(define DEL-A(make-patch 0 (make-delete 1)))
+(define DEL-C(make-patch 2 (make-delete 1)))
+(define DEL-POS0(make-patch 0 (make-delete 1)))
+
+;;Test cases
+
+;;case 1
+(check-expect (merge  "ABCD" DEL-A DEL-C) "BD")
+
+;;case 2
+(check-expect (merge "ABCDEF"  CD DEL-A) "BCCDDEF")
+
+;;case 3
+(check-expect (merge "ABCDEF" DEL-A CD) "BCCDDEF")
+
+;;case 4
+(check-expect (merge  "" AB CD) "ABCD")             
+
+(define (merge doc patch1 patch2)
+  (cond[(overlap? patch1 patch2) false] ; they overlap]
+  [else ;they do not overlap
+   ;; prepare for the many cases
+   (cond[(and (del-patch? patch1) (del-patch? patch2)) ;; case 1
+         ;; both patches are delete
+         (if (> (patch-pos patch1) (patch-pos patch2)) 
+         (apply-patch patch2 (apply-patch patch1 doc)) ; case a
+         (apply-patch patch1 (apply-patch patch2 doc)))] ; case b
+       [(del-patch? patch1) ; case 2
+            (apply-patch patch2 (apply-patch patch1 doc))]
+       [(del-patch? patch2) ; case 3
+            (apply-patch patch1 (apply-patch patch2 doc))]
+       [else ; must be case 4
+       (if (> (patch-pos patch1) (patch-pos patch2)) 
+         (apply-patch patch2 (apply-patch patch1 doc)) ; case a
+         (apply-patch patch1 (apply-patch patch2 doc))) ; case b
+         ])]))
+
+(define DOCUMENT "Hamlet: Do you see yonder cloud that's almost in shape of a camel?
+Polonius: By the mass, and 'tis like a camel, indeed.
+[...]
+Hamlet: Or like a whale?
+Polonius: Very like a whale.")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
