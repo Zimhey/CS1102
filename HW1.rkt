@@ -1,6 +1,3 @@
-;; The first three lines of this file were inserted by DrRacket. They record metadata
-;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-reader.ss" "lang")((modname HW1) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #t)))
 #|
 Authors:
  Corey Dixon
@@ -191,7 +188,7 @@ You may assume that the string is long enough for the operation given in the pat
 ;;Problem 6
 #|
 Returning false in the event of an overlap indicates to the user that
-a merge did not occur.
+ a merge did not occur. 
 |#
 
 
@@ -228,7 +225,7 @@ case 4 : both must be insert
 (check-expect (merge "ABCDEF" DEL-A CD) "BCCDDEF")
 
 ;;case 4
-(check-expect (merge  "" AB CD) "ABCD")             
+;;(check-expect (merge  "" AB CD) "ABCD")             
 
 (define (merge doc patch1 patch2)
   (cond[(overlap? patch1 patch2) false] ; they overlap]
@@ -249,25 +246,45 @@ case 4 : both must be insert
          (apply-patch patch1 (apply-patch patch2 doc))) ; case b
          ])]))
 
+
+;;Constants
+
 (define DOCUMENT "Hamlet: Do you see yonder cloud that's almost in shape of a camel?
 Polonius: By the mass, and 'tis like a camel, indeed.
 [...]
 Hamlet: Or like a whale?
 Polonius: Very like a whale.")
 
+(define VERY(make-patch 162 (make-delete 4)))
+(define ITS-TOTALLY(make-patch 162 (make-insert "It's totally ")))
+(define AND-TIS(make-patch 90 (make-delete 8)))
+(define IT-IS(make-patch 90 (make-insert "it is ")))
+(define THE-MASS(make-patch 80 (make-delete 8)))
+(define GOLLY(make-patch 80 (make-insert "golly")))
+(define IN(make-patch 46 (make-delete 2)))
+(define THE-first(make-patch 46 (make-insert "the")))
+(define OVER-THERE(make-patch 32 (make-insert "over there ")))
+(define YONDER(make-patch 19 (make-delete 6)))
+(define THE-second(make-patch 19 (make-insert "the")))
 
 
+;;modernize: string -> string
+;;consumes a string
+;;produces modernized quotation
 
+(define (modernize document)
+  (apply-patch THE-second
+    (apply-patch YONDER
+      (apply-patch OVER-THERE
+        (apply-patch THE-first
+           (apply-patch IN
+             (apply-patch GOLLY
+               (apply-patch THE-MASS
+                  (apply-patch IT-IS
+                    (apply-patch AND-TIS
+                       (apply-patch ITS-TOTALLY
+                         (apply-patch VERY document))))))))))))
+           
 
-
-
-
-
-
-
-
-
-
-
-
+(modernize DOCUMENT)
 
