@@ -20,6 +20,8 @@
 
 (define hwrk3.rkt (make-file 'hwrk3.rkt 128 "Homework 3"))
 
+(define empty.rkt (make-file 'empty.rkt 0 ""))
+
 ;; A list-of-files is either
 ;; empty, or
 ;; (cons s lof) where s is a file and lof is a list of files
@@ -33,7 +35,7 @@
 
 (define cdixon (make-dir 'cdixon empty (list hello_world motd hwrk3.rkt)))
 
-(define mjoconnell (make-dir 'mjoconnell empty (list motd hwrk3.rkt)))
+(define mjoconnell (make-dir 'mjoconnell empty (list motd hwrk3.rkt empty.rkt)))
 
 (define home (make-dir 'home (list cdixon mjoconnell) empty))
 
@@ -42,19 +44,54 @@
 
 ;;2. Write the template for functions over filesystems.
 
-;; fs-fun: dir -> ?
+#|
+file-fun : file -> ?
+(define (file-fun a-file)
+ ...(file-name a-file)...
+ ...(file-size a-file)...
+ ...(file-content a-file)...
+)
+|#
 
-(define (fs-fun adir)
-  (cond[(empty? (dir-dirs adir)) ...]
-       [cons? (dir-dirs adir) ...
-              ...
-              (fs-fun (rest (dir-dirs adir)))]))
+#| list-of-files-fun: list-of-files -> ?
+(define (los-fun alos)
+(cond [(empty? (los-fun alos)...]
+      [(cons? alos) ...
+          (file-fun (first alos))...
+          (los-fun alos (rest alos)) ...]))
+ |#
+
+#| list-of-directories: dir -> ?
+(define (lod-fun adir)
+  (cond[(empty? alod) ...]
+       [(cons? alod) ...
+              (lod-fun (first (dir-dirs adir))...
+              (lod-fun (rest (lod adir)))]))
+|#
 
 
 #|
 3. Write a function any-huge-files? that consumes a filesystem and a number (a file size)
 and returns a boolean indicating whether any file in the filesystem has size larger than the given size.
 |#
+;; any-huge-files? : filesystem number -> boolean
+;;consumes a filesystem and a file size
+;;produces a boolean indicating whether any file in the filesystem has a size larger than the give size.
+
+(define (any-huge-files? alod size)
+  (cond[(empty? alod) false]
+       [(cons? alod)
+               (or(> (length (filter (lambda (afile) (> (file-size afile) size)) (dir-files (first alod)))) 0)
+                  (any-huge-files? (rest alod) size)
+                  (any-huge-files? (dir-dirs (first alod)) size)
+                  )]))
+               
+
+
+(check-expect (any-huge-files? (list) 10) false)
+(check-expect (any-huge-files? (list cdixon) 100) true)
+(check-expect (any-huge-files? (list root) 0) true)
+
 
 #|
 4. Write a function clean-directory that consumes a filesystem and an existing directory name,
@@ -65,7 +102,20 @@ and returns a boolean indicating whether any file in the filesystem has size lar
 You may assume that the given directory name is only in the system once and that it has no subdirectories.
  You do not need to use these assumptions if you don't want to
  (i.e., no loss of points for not optimizing your code around this assumption).
+
 |#
+
+;;clean-directory : list-of-directories symbol -> list-of-directiories [excluding files of size 0]
+;;consumes a filesystem and an existing directory name
+;;produces a filesystem with no files of size 0
+
+(define (clean-directory alod name)
+  (cond[(empty? alod) false]
+       [(cons? alod) ...
+
+        (clean-directory (first alod)...
+              (clean-directory (rest alod))...
+
 
 #|
 5. Write a function find-file-path that consumes a filesystem and a filename
