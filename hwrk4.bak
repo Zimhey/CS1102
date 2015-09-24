@@ -1,0 +1,65 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-advanced-reader.ss" "lang")((modname hwrk4) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #t #t none #f () #f)))
+;;present question
+;;read answer
+;;optionally displays diagnostic information provided by the teacher based
+
+
+
+
+;;What kind of data is this language designed to process?
+;; I. Exams
+;;  Exams have:
+;;     A. Sections - can have questions and answers and feedback
+;;       a. questions - strings
+;;          Questions have:
+;;          i. answers - may be strings and/or numbers
+;;     B. feedback
+;;     C. diagonistic information (optional) - string
+;; II. Students
+;;    Students can have:
+;;      A. Exams
+;;
+
+;;What kind of operations can someone perform on the data?
+;; I. Specify questions to ask and answers to expect
+;; II. specify when to skip questions based on past results
+;; III. specify when to print summaries of student progress
+;; IV. specify when to print other messages to student
+
+;;What control operators do I need to sequence operations?
+;;  We sequencing exams and their content by putting them some (linear) order.
+
+;;What work is the language trying to save the programmer from doing?
+;; Save the programmer from repeatedly writing exams
+
+;;;;;;;;;; DATA DEFINITIONS FOR LANGUAGE ;;;;;;;;;;
+
+;;A talk is a (make-talk list[symbol] list[cmd])
+(define-struct talk (vars cmds))
+
+;;A cmd is
+;; - (make-question Q)
+;; - (make-skip )
+;; - (make-print-summary...
+
+;;A Q is (make-Q string string)
+(define-struct Q (qcontent expectedA))
+
+                           
+
+
+;;;;;;;;;; EXAMPLES OF DATA FOR SAMPLE EXAMS ;;;;;;;;;;
+
+
+
+What is 3+4? //<-enters displayed stringsd, and expected answer. 
+Ans: 7         <-user input //correct? //<-optional, skip question
+What is 10+3?   
+Ans: 13
+*skip* What is 1+1?
+*skip* What is 20+20?
+What is 5-3?
+Ans: 2
+
